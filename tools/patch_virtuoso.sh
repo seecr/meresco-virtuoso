@@ -23,8 +23,10 @@
 #
 ## end license ##
 
-yum makecache
-yum install git patch autoconf automake libtool flex bison gperf gawk m4 make openssl-devel java-1.6.0-openjdk-devel
+echo "Please verify you have installed:
+  git patch autoconf automake libtool flex bison gperf gawk m4 make openssl-devel java-1.6.0-openjdk-devel"""
+echo "Press enter to continue"
+read
 
 javac -version 2>&1 | grep 1.6 > /dev/null || echo "javac should be java 6"
 
