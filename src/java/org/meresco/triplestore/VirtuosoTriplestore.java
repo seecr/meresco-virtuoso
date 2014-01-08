@@ -31,9 +31,9 @@ import virtuoso.sesame2.driver.VirtuosoRepository;
 
 class VirtuosoTriplestore extends SesameTriplestore {
 
-    public VirtuosoTriplestore(File directory, Integer port, String username, String password) {
+    public VirtuosoTriplestore(File directory, String hostname, Integer port, String username, String password) {
         super(directory);
-        this.repository = new VirtuosoRepository("jdbc:virtuoso://localhost:" + port, username, password);
+        this.repository = new VirtuosoRepository("jdbc:virtuoso://" + hostname + ":" + port, username, password);
         startup();
     }
 }

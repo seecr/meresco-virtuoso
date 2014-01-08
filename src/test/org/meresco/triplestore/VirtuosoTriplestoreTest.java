@@ -50,7 +50,7 @@ public class VirtuosoTriplestoreTest {
     @Before
     public void setUp() throws Exception {
         tempdir = createTempDirectory();
-        ts = new VirtuosoTriplestore(tempdir, 1111, "dba", "dba");
+        ts = new VirtuosoTriplestore(tempdir, "localhost", 1111, "dba", "dba");
     }
 
     @After
