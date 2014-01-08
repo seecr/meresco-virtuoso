@@ -1,1 +1,2 @@
 virtuoso-opensource-7.0.0
+meresco-triplestore (>= 4.6)
