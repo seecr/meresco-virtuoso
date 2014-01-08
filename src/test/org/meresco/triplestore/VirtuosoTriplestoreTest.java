@@ -59,18 +59,6 @@ public class VirtuosoTriplestoreTest {
     }
 
     @Test
-    public void testAddGetsStatment() throws Exception {
-        long startingPoint = ts.size();
-        ts.add("uri:id0", rdf);
-        RepositoryResult<Statement> statements = ts.getStatements(null, null, null);
-        assertEquals(startingPoint + 2, statements.asList().size());
-        List<Statement> statementList = ts.getStatements(new URIImpl("http://www.example.org/index.html"), null, null).asList();
-        assertEquals(2, statementList.size());
-        assertEquals(new LiteralImpl("August 16, 1999"), statementList.get(0).getObject());
-        assertEquals(new LiteralImpl("A.M. Özman Yürekli"), statementList.get(1).getObject());
-    }
-
-    @Test
     public void testAddRemoveTriple() throws Exception {
         long startingPoint = ts.size();
         ts.addTriple("uri:subj|uri:pred|uri:obj");
@@ -120,10 +108,14 @@ public class VirtuosoTriplestoreTest {
         String answer = null;
 
         ts.add("uri:id0", rdf);
-        answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.SPARQL);
-        assertTrue(answer.startsWith("<?xml"));
-        assertTrue(answer.indexOf("<literal>A.M. Özman Yürekli</literal>") > -1);
-        assertTrue(answer.endsWith("</sparql>\n"));
+        try {
+            answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.SPARQL);
+            assertTrue(answer.startsWith("<?xml"));
+            assertTrue(answer.indexOf("<literal>A.M. Özman Yürekli</literal>") > -1);
+            assertTrue(answer.endsWith("</sparql>\n"));
+        } finally {
+            ts.delete("uri:id0");
+        }
     }
 
     static final String rdf = "<?xml version='1.0'?>" +

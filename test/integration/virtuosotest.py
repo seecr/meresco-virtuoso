@@ -139,7 +139,6 @@ class VirtuosoTest(IntegrationTestCase):
         </rdf:RDF>""" % i, parse=False)
                 totalTime += time() - start
 
-            print totalTime / number
             self.assertTiming(0.001, totalTime / number, 0.010)
         finally:
             postRequest(self.virtuosoPort, "/delete?identifier=uri:record", "")

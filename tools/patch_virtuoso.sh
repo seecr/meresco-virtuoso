@@ -23,6 +23,8 @@
 #
 ## end license ##
 
+set -o errexit
+
 echo "Please verify you have installed:
   git patch autoconf automake libtool flex bison gperf gawk m4 make openssl-devel java-1.6.0-openjdk-devel"""
 echo "Press enter to continue"
@@ -30,7 +32,7 @@ read
 
 javac -version 2>&1 | grep 1.6 > /dev/null || echo "javac should be java 6"
 
-git clone git://git.code.sf.net/p/virtuoso/virtuoso-opensource
+# git clone git://git.code.sf.net/p/virtuoso/virtuoso-opensource
 cd virtuoso-opensource
 git checkout v7.0.0
 
@@ -42,7 +44,15 @@ export CFLAGS
 cat <<EOF | patch -p0
 --- binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java    2014-01-08 14:19:47.647022290 +0100
 +++ binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java.new    2014-01-08 14:19:41.038916571 +0100
-@@ -2835,7 +2835,9 @@
+@@ -2723,6 +2723,7 @@
+			}
+			catch (Exception e)
+			{
++				e.printStackTrace();
+			    throw createException(e);
+			}
+		}
+@@ -2836,7 +2836,9 @@
 				String col = rsmd.getColumnName(i);
 				Object val = v_rs.getObject(i);
 				Value v = castValue(val);
@@ -71,6 +81,6 @@ export JAR
 make virt_sesame2.jar
 
 cd ../../..
-cp virtuoso-opensource/binsrc/sesame2/virt_sesame2.jar .
-cp virtuoso-opensource/libsrc/JDBCDriverType4/virtjdbc4.jar .
+cp virtuoso-opensource/binsrc/sesame2/virt_sesame2.jar ../jars
+cp virtuoso-opensource/libsrc/JDBCDriverType4/virtjdbc4.jar ../jars
 rm -rf virtuoso-opensource
