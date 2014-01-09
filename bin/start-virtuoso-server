@@ -28,8 +28,9 @@ if [ "$#" != "1" ]; then
     exit 1
 fi
 
-stateDir=$(cd $1; pwd)
-mkdir $stateDir/db
+stateDir=$1
+mkdir -p $stateDir/db
+stateDir=(cd $stateDir; pwd)
 
 INI_FILE=$stateDir/meresco-virtuoso.ini
 
