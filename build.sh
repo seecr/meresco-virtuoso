@@ -25,6 +25,8 @@
 
 VERSION=$1
 
+javac -version 2>&1 | grep 1.6 > /dev/null || echo "javac should be java 6"; exit 1
+
 MERESCO_TRIPLESTORE_JARS=$(test -d /usr/share/java/meresco-triplestore && find /usr/share/java/meresco-triplestore -type f -name "*.jar")
 MERESCO_TRIPLESTORE_JARS=$(find -L deps.d/* -type f -name "*.jar") # DO_NOT_DISTRIBUTE
 JARS=$(find jars -type f -name "*.jar")
