@@ -45,6 +45,10 @@ maxMemArgs = [arg for arg in argv[1:] if arg.startswith('-Xmx')]
 maxMem = maxMemArgs[-1] if maxMemArgs else '-Xmx1536m'
 argv = [arg for arg in argv if arg != maxMem]
 
+if system("java -version 2>&1 | grep '1.6' > /dev/null") != 0:
+    print "Java version should be java 6"
+    exit(1)
+
 execv("/usr/bin/java", [
     argv[0],
     maxMem,
