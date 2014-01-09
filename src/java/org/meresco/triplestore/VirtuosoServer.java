@@ -50,22 +50,22 @@ public class VirtuosoServer {
         option.setRequired(true);
         options.addOption(option);
 
-        option = new Option("hostname", "hostname", true, "Hostame of the virtuoso instance");
+        option = new Option(null, "hostname", true, "Hostame of the virtuoso instance");
         option.setType(String.class);
         option.setRequired(true);
         options.addOption(option);
 
-        option = new Option("virtuosoPort", "virtuosoPort", true, "Port number of the virtuoso instance");
+        option = new Option(null, "odbcPort", true, "Odbc port number of the virtuoso instance");
         option.setType(Integer.class);
         option.setRequired(true);
         options.addOption(option);
 
-        option = new Option("username", "username", true, "Username of virtuoso");
+        option = new Option(null, "username", true, "Username of the virtuoso instance");
         option.setType(String.class);
         option.setRequired(true);
         options.addOption(option);
 
-        option = new Option("password", "password", true, "Password of virtuoso");
+        option = new Option(null, "password", true, "Password of the virtuoso instance");
         option.setType(String.class);
         option.setRequired(true);
         options.addOption(option);
@@ -83,7 +83,7 @@ public class VirtuosoServer {
         Integer port = new Integer(commandLine.getOptionValue("p"));
         String stateDir = commandLine.getOptionValue("d");
         String hostname = commandLine.getOptionValue("hostname");
-        Integer virtuosoPort = new Integer(commandLine.getOptionValue("virtuosoPort"));
+        Integer odbcPort = new Integer(commandLine.getOptionValue("odbcPort"));
         String username = commandLine.getOptionValue("username");
         String password = commandLine.getOptionValue("password");
         Boolean disableTransactionLog = commandLine.hasOption("disableTransactionLog");
@@ -93,7 +93,7 @@ public class VirtuosoServer {
             System.exit(1);
         }
 
-        Triplestore tripleStore = new VirtuosoTriplestore(new File(stateDir), hostname, virtuosoPort, username, password);
+        Triplestore tripleStore = new VirtuosoTriplestore(new File(stateDir), hostname, odbcPort, username, password);
         HttpHandler handler = new HttpHandler(tripleStore);
         HttpServer httpServer = new HttpServer(port, 15);
 
