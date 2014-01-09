@@ -30,7 +30,7 @@ fi
 
 stateDir=$1
 mkdir -p $stateDir/db
-stateDir=(cd $stateDir; pwd)
+stateDir=$(cd $stateDir; pwd)
 
 INI_FILE=$stateDir/meresco-virtuoso.ini
 
