@@ -1,4 +1,5 @@
-virtuoso-opensource-7.0.0
+virtuoso-opensource (>= 7.0.0)
+virtuoso-opensource (<< 8.0.0)
 meresco-triplestore-client (>= 4.5.3)
 meresco-triplestore-client (<< 4.6)
 meresco-triplestore-server (>= 4.5.3)
