@@ -34,6 +34,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 
+import org.openrdf.rio.RDFParseException;
+
 public class VirtuosoServer {
     public static void main(String[] args) throws Exception {
         Option option;
@@ -94,7 +96,12 @@ public class VirtuosoServer {
         }
 
         Triplestore tripleStore = new VirtuosoTriplestore(new File(stateDir), hostname, odbcPort, username, password);
-        HttpHandler handler = new HttpHandler(tripleStore);
+        HttpHandler handler = new HttpHandler(tripleStore) {
+            @Override
+            public synchronized void updateRDF(QueryParameters params, String httpBody) throws RDFParseException {
+                addRDF(params, httpBody);
+            }
+        };
         HttpServer httpServer = new HttpServer(port, 15);
 
         System.out.println("Triplestore started with " + String.valueOf(tripleStore.size()) + " statements");
