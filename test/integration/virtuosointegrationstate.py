@@ -50,7 +50,7 @@ class VirtuosoIntegrationState(IntegrationState):
         return serverBinDir
 
     def startVirtuosoServer(self):
-        self._startServer('virtuoso', self.binPath('start-virtuoso'), 'http://localhost:%s/query' % self.virtuosoPort, port=self.virtuosoPort, stateDir=self.virtuosoDataDir, hostname="localhost", virtuosoPort="1111", username="dba", password="dba")
+        self._startServer('virtuoso', self.binPath('start-virtuoso'), 'http://localhost:%s/query' % self.virtuosoPort, port=self.virtuosoPort, stateDir=self.virtuosoDataDir, hostname="localhost", odbcPort="1111", username="dba", password="dba")
 
     def restartVirtuosoServer(self):
         self.stopVirtuosoServer()
