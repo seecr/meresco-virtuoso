@@ -26,6 +26,11 @@
 
 package org.meresco.triplestore;
 
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.query.parser.QueryParserUtil;
+
 import java.io.File;
 import virtuoso.sesame2.driver.VirtuosoRepository;
 
@@ -35,5 +40,14 @@ class VirtuosoTriplestore extends SesameTriplestore {
         super(directory);
         this.repository = new VirtuosoRepository("jdbc:virtuoso://" + hostname + ":" + port, username, password);
         startup();
+    }
+
+    public String executeQuery(String sparQL, TupleQueryResultFormat resultFormat) throws MalformedQueryException {
+        try {
+            return super.executeQuery(sparQL, resultFormat);
+        } catch (RuntimeException e) {
+            QueryParserUtil.parseTupleQuery(QueryLanguage.SPARQL, sparQL, null);
+            throw e;
+        }
     }
 }
