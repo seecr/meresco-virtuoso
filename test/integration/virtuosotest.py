@@ -33,7 +33,7 @@ from weightless.core import compose
 from seecr.test.utils import getRequest, postRequest
 from seecr.test.integrationtestcase import IntegrationTestCase
 
-from meresco.owlim import HttpClient, MalformedQueryException, InvalidRdfXmlException
+from meresco.triplestore import HttpClient, MalformedQueryException, InvalidRdfXmlException
 
 
 class VirtuosoTest(IntegrationTestCase):
@@ -42,35 +42,35 @@ class VirtuosoTest(IntegrationTestCase):
         self.assertTrue('"vars" : [ "x" ]' in result, result)
 
     def testAddTripleThatsNotATriple(self):
-        owlimClient = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
+        client = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
         try:
-            list(compose(owlimClient.addTriple('uri:subject', 'uri:predicate', '')))
+            list(compose(client.addTriple('uri:subject', 'uri:predicate', '')))
             self.fail("should not get here")
         except ValueError, e:
             self.assertEquals('java.lang.IllegalArgumentException: Not a triple: "uri:subject|uri:predicate|"', str(e))
 
     def testAddInvalidRdf(self):
-        owlimClient = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
+        client = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
         try:
-            list(compose(owlimClient.add('uri:identifier', '<invalidRdf/>')))
+            list(compose(client.add('uri:identifier', '<invalidRdf/>')))
             self.fail("should not get here")
         except InvalidRdfXmlException, e:
             self.assertTrue('org.openrdf.rio.RDFParseException: Not a valid (absolute) URI: #invalidRdf [line 1, column 14]' in str(e), str(e))
 
     def testAddInvalidIdentifier(self):
-        owlimClient = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
+        client = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
         try:
-            list(compose(owlimClient.add('identifier', '<ignore/>')))
+            list(compose(client.add('identifier', '<ignore/>')))
             self.fail("should not get here")
         except ValueError, e:
             self.assertEquals('java.lang.IllegalArgumentException: Not a valid (absolute) URI: identifier', str(e))
 
     def testInvalidSparql(self):
-        owlimClient = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
+        client = HttpClient(host='localhost', port=self.virtuosoPort, synchronous=True)
         try:
-            list(compose(owlimClient.executeQuery("""select ?x""")))
+            list(compose(client.executeQuery("""select ?x""")))
         except MalformedQueryException, e:
-            self.assertTrue(str(e).startswith('java.lang.RuntimeException: org.openrdf.query.QueryEvaluationException: : SPARQL execute failed:[select ?x]'), str(e))
+            self.assertTrue(str(e).startswith('org.openrdf.query.MalformedQueryException: Encountered "<EOF>"'), str(e))
 
     def testDeleteRecord(self):
         postRequest(self.virtuosoPort, "/add?identifier=uri:record", """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
