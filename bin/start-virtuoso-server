@@ -36,6 +36,6 @@ INI_FILE=$stateDir/meresco-virtuoso.ini
 
 cp /etc/virtuoso/virtuoso.ini $INI_FILE
 
-sed -i "s,/var/lib/virtuoso,$stateDir,g" $INI_FILE
+sed -i "s,/var/lib/virtuoso/db,${stateDir}/db,g" $INI_FILE
 
 exec virtuoso-t +configfile $INI_FILE +foreground
