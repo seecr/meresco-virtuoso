@@ -32,7 +32,7 @@ read
 
 javac -version 2>&1 | grep 1.6 > /dev/null || echo "javac should be java 6"
 
-# git clone git://git.code.sf.net/p/virtuoso/virtuoso-opensource
+git clone git://git.code.sf.net/p/virtuoso/virtuoso-opensource
 cd virtuoso-opensource
 git checkout v7.0.0
 
@@ -44,6 +44,15 @@ export CFLAGS
 cat <<EOF | patch -p0
 --- binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java    2014-01-08 14:19:47.647022290 +0100
 +++ binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java.new    2014-01-08 14:19:41.038916571 +0100
+@@ -2300,7 +2300,7 @@
+ 	}
+
+ 	private void clearQuadStore(Resource[] contexts) throws RepositoryException {
+-		String  query = "sparql clear graph iri(??)";
++		String  query = "sparql DEFINE sql:log-enable 3 clear graph iri(??)";
+
+                 if (contexts!=null && contexts.length > 0)
+ 		  try {
 @@ -2723,6 +2723,7 @@
 			}
 			catch (Exception e)
