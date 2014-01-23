@@ -138,8 +138,35 @@ class VirtuosoTest(IntegrationTestCase):
             </rdf:Description>
         </rdf:RDF>""" % i, parse=False)
                 totalTime += time() - start
-
             self.assertTiming(0.001, totalTime / number, 0.010)
+        finally:
+            postRequest(self.virtuosoPort, "/delete?identifier=uri:record", "")
+
+    def testUpdatePerformance(self):
+        totalTime = 0
+        try:
+            number = 1000
+            for i in range(number):
+                for j in range(2):
+                    start = time()
+                    postRequest(self.virtuosoPort, "/update?identifier=uri:record%s" % i, """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:ex="http://example.org#" xmlns:dc="http://dc.org/test#">
+                <rdf:Description>
+                    <rdf:type>uri:testSecond%s</rdf:type>
+                </rdf:Description>
+                <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar">
+                  <ex:editor>
+                    <rdf:Description>
+                      <ex:homePage rdf:resource="http://purl.org/net/dajobe/"/>
+                      <ex:fullName>Dave Beckett</ex:fullName>
+                    </rdf:Description>
+                  </ex:editor>
+                  <dc:title>RDF/XML Syntax Specification (Revised)</dc:title>
+                </rdf:Description>
+            </rdf:RDF>""" % i, parse=False)
+                    totalTime += time() - start
+            print totalTime / (number * 2)
+            print totalTime
+            self.assertTiming(0.001, totalTime / (number * 2), 0.010)
         finally:
             postRequest(self.virtuosoPort, "/delete?identifier=uri:record", "")
 
