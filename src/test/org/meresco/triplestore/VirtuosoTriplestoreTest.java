@@ -68,6 +68,28 @@ public class VirtuosoTriplestoreTest {
     }
 
     @Test
+    public void testAddTripleTwice() throws Exception {
+        long startingPoint = ts.size();
+        ts.addTriple("uri:subj|uri:pred|uri:obj");
+        ts.addTriple("uri:subj|uri:pred|uri:obj");
+        assertEquals(startingPoint + 1, ts.size());
+        ts.removeTriple("uri:subj|uri:pred|uri:obj");
+        assertEquals(startingPoint, ts.size());
+    }
+
+    @Test
+    public void testAddRdfTwice() throws Exception {
+        long startingPoint = ts.size();
+        ts.add("uri:id0", rdf);
+        try {
+            assertEquals(startingPoint + 2, ts.size());
+        } finally {
+            ts.delete("uri:id0");
+        }
+        assertEquals(startingPoint, ts.size());
+    }
+
+    @Test
     public void testDelete() throws Exception {
         ts.add("uri:id0", rdf);
         long startingPoint = ts.size();
