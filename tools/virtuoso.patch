@@ -1,0 +1,91 @@
+From 30e1daa168e1fee66efccc3b0c502979f3324d4a Mon Sep 17 00:00:00 2001
+From: Thijs Janssen <thijs@seecr.nl>
+Date: Tue, 18 Feb 2014 15:15:35 +0100
+Subject: [PATCH 1/3] HM/TJ: print stacktrace
+
+---
+ binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java b/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
+index 38306a7..7874445 100644
+--- a/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
++++ b/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
+@@ -2818,6 +2818,7 @@ public class VirtuosoRepositoryConnection implements RepositoryConnection {
+ 			}
+ 			catch (Exception e)
+ 			{
++				e.printStackTrace();
+ 			    throw createException(e);
+ 			}
+ 		}
+-- 
+1.7.10.4
+
+
+From 7dcff2e1aefde0ea8ddd3142f4a3e83307187229 Mon Sep 17 00:00:00 2001
+From: Thijs Janssen <thijs@seecr.nl>
+Date: Tue, 18 Feb 2014 15:15:59 +0100
+Subject: [PATCH 2/3] HM/TJ: null check
+
+---
+ binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java b/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
+index 7874445..a0bb2ff 100644
+--- a/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
++++ b/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
+@@ -2931,7 +2931,9 @@ public class VirtuosoRepositoryConnection implements RepositoryConnection {
+ 				String col = rsmd.getColumnName(i);
+ 				Object val = v_rs.getObject(i);
+ 				Value v = castValue(val);
+-				((QueryBindingSet)v_row).setBinding(col, v);
++				if (v != null){
++					((QueryBindingSet)v_row).setBinding(col, v);
++				}
+ 			}
+ 		}
+ 	}
+-- 
+1.7.10.4
+
+
+From 7570ebbd807d175e5fd39a120180b78722c74a10 Mon Sep 17 00:00:00 2001
+From: Thijs Janssen <thijs@seecr.nl>
+Date: Tue, 18 Feb 2014 15:16:18 +0100
+Subject: [PATCH 3/3] HM/TJ: 'with ... delete' instead of clear graph
+
+---
+ .../virtuoso_driver/VirtuosoRepositoryConnection.java      |   12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java b/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
+index a0bb2ff..50b3105 100644
+--- a/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
++++ b/binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java
+@@ -2363,16 +2363,14 @@ public class VirtuosoRepositoryConnection implements RepositoryConnection {
+ 
+ 	
+ 	private void clearQuadStore(Resource[] contexts) throws RepositoryException {
+-		String  query = "sparql clear graph iri(??)";
+-
+-                if (contexts!=null && contexts.length > 0)
++        if (contexts!=null && contexts.length > 0)
+ 		  try {
+-			PreparedStatement ps = prepareStatement(query);
++			java.sql.Statement stmt = createStatement();
+ 			for (int i = 0; i < contexts.length; i++) {
+-				ps.setString(1, contexts[i].stringValue());
+-				ps.execute();
++				String query = "sparql with <" + contexts[i].stringValue() + "> delete { ?s ?p ?o } where { ?s ?p ?o } ";
++				stmt.execute(query);
+ 			}
+-			ps.close();
++			stmt.close();
+ 		  }
+ 		  catch (Exception e) {
+ 			throw new RepositoryException(e);
+-- 
+1.7.10.4
+
