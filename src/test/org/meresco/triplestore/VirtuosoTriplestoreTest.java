@@ -98,6 +98,23 @@ public class VirtuosoTriplestoreTest {
     }
 
     @Test
+    public void testSparqlWithDelete() throws Exception {
+        String answer = null;
+
+        ts.add("uri:id0", rdf);
+        try {
+            answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
+            assertTrue(answer.indexOf("\"value\" : \"A.M. Özman Yürekli\"") > -1);
+            assertTrue(answer.endsWith("\n}"));
+        } finally {
+            ts.delete("uri:id0");
+        }
+        answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
+        assertFalse(answer.indexOf("\"value\" : \"A.M. Özman Yürekli\"") > -1);
+
+    }
+
+    @Test
     public void testSparql() throws Exception {
         String answer = null;
 

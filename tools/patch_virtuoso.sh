@@ -32,38 +32,23 @@ read
 
 javac -version 2>&1 | grep 1.6 > /dev/null || echo "javac should be java 6"
 
-# git clone git://git.code.sf.net/p/virtuoso/virtuoso-opensource
+if [ ! -d virtuoso-opensource ]; then
+	echo "Please make sure there is an actual version of the virtuoso-opensource code
+    git clone https://github.com/openlink/virtuoso-opensource.git"
+    exit 1
+fi
 cd virtuoso-opensource
-git checkout v7.0.0
+tempbranch="v7.1.0-patch"
+git checkout master
+git branch | grep $tempbranch && git branch -D $tempbranch
+git checkout v7.1.0 -b $tempbranch
 
 ./autogen.sh
 CFLAGS="-O2 -m64"
 export CFLAGS
 ./configure
 
-cat <<EOF | patch -p0
---- binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java    2014-01-08 14:19:47.647022290 +0100
-+++ binsrc/sesame2/virtuoso_driver/VirtuosoRepositoryConnection.java.new    2014-01-08 14:19:41.038916571 +0100
-@@ -2723,6 +2723,7 @@
-			}
-			catch (Exception e)
-			{
-+				e.printStackTrace();
-			    throw createException(e);
-			}
-		}
-@@ -2836,7 +2836,9 @@
-				String col = rsmd.getColumnName(i);
-				Object val = v_rs.getObject(i);
-				Value v = castValue(val);
--				((QueryBindingSet)v_row).setBinding(col, v);
-+				if (v != null) {
-+					((QueryBindingSet)v_row).setBinding(col, v);
-+				}
-			}
-		}
-	}
-EOF
+patch -p1 < $(dirname `pwd`)/virtuoso.patch
 
 cd binsrc/sesame2
 mkdir lib
