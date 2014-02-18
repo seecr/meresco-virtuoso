@@ -23,21 +23,36 @@
 #
 ## end license ##
 
-if [ "$#" != "1" ]; then
-    echo "Usage: $0 <state directory>"
+
+
+ODBC_PORT=1111
+HTTP_PORT=8890
+while getopts ":o:h:s:" opt; do
+    case $opt in
+        o) ODBC_PORT="$OPTARG";;
+        h) HTTP_PORT="$OPTARG";;
+        s) STATEDIR="$OPTARG";;
+        \?) ... ;;
+        :) echo "option requires an argument -- $OPTARG" >&2 ;;
+    esac
+done
+
+if [ -z "$STATEDIR" ]; then
+    echo "Usage: $0 -s <state directory> [ -o ODBC_PORT ] [ -h HTTP_PORT ]"
     exit 1
 fi
-
-stateDir=$1
-mkdir -p $stateDir/db
-stateDir=$(cd $stateDir; pwd)
-
-INI_FILE=$stateDir/meresco-virtuoso.ini
+mkdir -p $STATEDIR/db
+STATEDIR=$(cd $STATEDIR; pwd)
+INI_FILE=$STATEDIR/meresco-virtuoso.ini
 defaultIniFile=/etc/virtuoso/virtuoso.ini
 test -f $defaultIniFile || defaultIniFile=/var/lib/virtuoso/db/virtuoso.ini
 
 cp $defaultIniFile $INI_FILE
 
-sed -i "s,/var/lib/virtuoso/db,${stateDir}/db,g" $INI_FILE
+sed -i $INI_FILE -re "
+        s,/var/lib/virtuoso/db,${STATEDIR}/db,g;
+        /\[Parameters\]/,+4 s/^ServerPort.*/ServerPort = ${ODBC_PORT}/;
+        /\[HTTPServer\]/,+4 s/^ServerPort.*/ServerPort = ${HTTP_PORT}/;
+    "
 
 exec virtuoso-t +configfile $INI_FILE +foreground
