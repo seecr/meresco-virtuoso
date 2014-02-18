@@ -33,8 +33,10 @@ mkdir -p $stateDir/db
 stateDir=$(cd $stateDir; pwd)
 
 INI_FILE=$stateDir/meresco-virtuoso.ini
+defaultIniFile=/etc/virtuoso/virtuoso.ini
+test -f $defaultIniFile || defaultIniFile=/var/lib/virtuoso/db/virtuoso.ini
 
-cp /etc/virtuoso/virtuoso.ini $INI_FILE
+cp $defaultIniFile $INI_FILE
 
 sed -i "s,/var/lib/virtuoso/db,${stateDir}/db,g" $INI_FILE
 
