@@ -2,5 +2,5 @@
 #wheezy:openjdk-6-jdk
 #centos5:java-1.6.0-openjdk-devel
 #centos6:java-1.6.0-openjdk-devel
-meresco-triplestore-server (>= 4.5.3)
-meresco-triplestore-server (<< 4.6)
+meresco-triplestore-server (>= 4.6)
+meresco-triplestore-server (<< 4.7)
