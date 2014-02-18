@@ -96,12 +96,7 @@ public class VirtuosoServer {
         }
 
         Triplestore tripleStore = new VirtuosoTriplestore(new File(stateDir), hostname, odbcPort, username, password);
-        HttpHandler handler = new HttpHandler(tripleStore) {
-            @Override
-            public synchronized void updateRDF(QueryParameters params, String httpBody) throws RDFParseException {
-                addRDF(params, httpBody);
-            }
-        };
+        HttpHandler handler = new HttpHandler(tripleStore);
         HttpServer httpServer = new HttpServer(port, 15);
 
         System.out.println("Triplestore started with " + String.valueOf(tripleStore.size()) + " statements");

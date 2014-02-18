@@ -87,7 +87,7 @@ class VirtuosoTest(IntegrationTestCase):
         </rdf:Description>
     </rdf:RDF>""", parse=False)
         json = self.query('SELECT ?x WHERE {?x ?y "uri:testDelete"}')
-        self.assertEquals(1, len(json['results']['bindings']))
+        self.assertEquals(0, len(json['results']['bindings']))
         json = self.query('SELECT ?x WHERE {?x ?y "uri:testDeleteUpdated"}')
         self.assertEquals(1, len(json['results']['bindings']))
 
