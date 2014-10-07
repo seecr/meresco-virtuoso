@@ -34,6 +34,7 @@ from seecr.test.utils import getRequest, postRequest
 from seecr.test.integrationtestcase import IntegrationTestCase
 
 from meresco.triplestore import HttpClient, MalformedQueryException, InvalidRdfXmlException
+from os.path import join
 
 
 class VirtuosoTest(IntegrationTestCase):
@@ -211,6 +212,30 @@ class VirtuosoTest(IntegrationTestCase):
         </result>
     </results>
 </sparql>""", contents)
+
+    def testBatchUpload(self):
+        with open(join(self.virtuosoDataDir, "bulk_load", "test.rdf"), 'w') as f:
+            f.write("""<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description>
+        <rdf:type>uri:testBatchUpload</rdf:type>
+    </rdf:Description>
+</rdf:RDF>""")
+        self.runBatchUpload(graph="uri:example.org")
+        json = self.query('SELECT ?s WHERE { ?s ?p "uri:testBatchUpload" }')
+        self.assertEquals(1, len(json['results']['bindings']))
+
+        with open(join(self.virtuosoDataDir, "bulk_load", "test2.rdf"), 'w') as f:
+            f.write("""<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description>
+        <rdf:type>uri:testBatchUpload2</rdf:type>
+    </rdf:Description>
+</rdf:RDF>""")
+        self.runBatchUpload(graph="uri:example.org")
+        json = self.query('SELECT ?s WHERE { ?s ?p "uri:testBatchUpload" }')
+        self.assertEquals(1, len(json['results']['bindings']))
+        json = self.query('SELECT ?s WHERE { ?s ?p "uri:testBatchUpload2" }')
+        self.assertEquals(1, len(json['results']['bindings']))
+
 
     def query(self, query):
         return loads(urlopen('http://localhost:%s/query?%s' % (self.virtuosoPort,

@@ -23,14 +23,11 @@
 #
 ## end license ##
 
-
-
 ODBC_PORT=1111
-HTTP_PORT=8890
 
 TEMP=$(getopt \
     --options "" \
-    --long odbcPort::,stateDir::,httpPort:: \
+    --long odbcPort::,stateDir::,graph:: \
     -n "$0" -- "$@")
 
 eval set -- "$TEMP"
@@ -42,8 +39,8 @@ while true ; do
         --stateDir)
             STATEDIR=$2; shift 2
             ;;
-        --httpPort)
-            HTTP_PORT=$2; shift 2
+        --graph)
+            GRAPH=$2; shift 2
             ;;
         --)
             shift
@@ -56,25 +53,11 @@ while true ; do
     esac
 done
 
-if [ -z "$STATEDIR" -o -z "$ODBC_PORT" -o -z "$HTTP_PORT" ]; then
-    echo "Usage: $0 --stateDir=<state directory> [ --odbcPort=ODBC_PORT ] [ --httpPort=HTTP_PORT ]"
+if [ -z "$STATEDIR" -o -z "$GRAPH" ]; then
+    echo "Usage: $0 --stateDir=<state directory> --graph=<graph> [ -odbcPort=ODBC_PORT ]"
     exit 1
 fi
-mkdir -p $STATEDIR/db
-STATEDIR=$(cd $STATEDIR; pwd)
+
 BULK_LOAD_DIR="${STATEDIR}/bulk_load"
-test -d ${BULK_LOAD_DIR} || mkdir -p ${BULK_LOAD_DIR}
-
-INI_FILE=$STATEDIR/meresco-virtuoso.ini
-defaultIniFile=/etc/virtuoso/virtuoso.ini
-test -f $defaultIniFile || defaultIniFile=/var/lib/virtuoso/db/virtuoso.ini
-cp $defaultIniFile $INI_FILE
-
-sed -i $INI_FILE -re "
-        s,/var/lib/virtuoso/db,${STATEDIR}/db,g;
-        /\[Parameters\]/,+4 s,^ServerPort.*,ServerPort = ${ODBC_PORT},;
-        /\[HTTPServer\]/,+4 s,^ServerPort.*,ServerPort = ${HTTP_PORT},;
-        /\[Parameters\]/,+30 s,^DirsAllowed.*,DirsAllowed = ${BULK_LOAD_DIR},;
-    "
-
-exec virtuoso-t +configfile $INI_FILE +foreground
+isql-v ${ODBC_PORT} exec="ld_dir ('${BULK_LOAD_DIR}', '*', '${GRAPH}');"
+isql-v ${ODBC_PORT} exec="rdf_loader_run();"

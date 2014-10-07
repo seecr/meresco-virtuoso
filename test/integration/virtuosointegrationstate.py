@@ -38,6 +38,8 @@ class VirtuosoIntegrationState(IntegrationState):
 
         self.virtuosoDataDir = join(self.integrationTempdir, 'virtuoso-data')
         self.virtuosoPort = PortNumberGenerator.next()
+        self.odbcPort = PortNumberGenerator.next()
+        self.httpPort = PortNumberGenerator.next()
         self.testdataDir = join(dirname(myDir), 'data')
         if not fastMode:
             system('rm -rf ' + self.integrationTempdir)
@@ -45,17 +47,24 @@ class VirtuosoIntegrationState(IntegrationState):
 
     def setUp(self):
         self.startVirtuosoServer()
+        self.startVirtuoso()
 
     def binDir(self):
         return serverBinDir
 
+    def startVirtuoso(self):
+        self._startServer('virtuoso', self.binPath('start-virtuoso'), 'http://localhost:%s/query' % self.virtuosoPort, port=self.virtuosoPort, stateDir=self.virtuosoDataDir, hostname="localhost", odbcPort=self.odbcPort, username="dba", password="dba")
+
     def startVirtuosoServer(self):
-        self._startServer('virtuoso', self.binPath('start-virtuoso'), 'http://localhost:%s/query' % self.virtuosoPort, port=self.virtuosoPort, stateDir=self.virtuosoDataDir, hostname="localhost", odbcPort="1111", username="dba", password="dba")
+        self._startServer('virtuoso-server', self.binPath('start-virtuoso-server'), 'http://localhost:%s/sparql' % self.httpPort, stateDir=self.virtuosoDataDir, odbcPort=self.odbcPort, httpPort=self.httpPort)
 
-    def restartVirtuosoServer(self):
-        self.stopVirtuosoServer()
-        self.startVirtuosoServer()
+    def restartVirtuoso(self):
+        self.stopVirtuoso()
+        self.startVirtuoso()
 
-    def stopVirtuosoServer(self):
+    def stopVirtuoso(self):
         self._stopServer('virtuoso')
+
+    def runBatchUpload(self, graph):
+        self._runExecutable(self.binPath('virtuoso-batch-upload'), stateDir=self.virtuosoDataDir, odbcPort=self.odbcPort, graph=graph)
 
