@@ -37,6 +37,7 @@ class VirtuosoIntegrationState(IntegrationState):
         IntegrationState.__init__(self, stateName=stateName, tests=tests, fastMode=fastMode)
 
         self.virtuosoDataDir = join(self.integrationTempdir, 'virtuoso-data')
+        self.bulkLoadDir = join(self.integrationTempdir, 'bulk-load-data')
         self.virtuosoPort = PortNumberGenerator.next()
         self.odbcPort = PortNumberGenerator.next()
         self.httpPort = PortNumberGenerator.next()
@@ -56,7 +57,7 @@ class VirtuosoIntegrationState(IntegrationState):
         self._startServer('virtuoso', self.binPath('start-virtuoso'), 'http://localhost:%s/query' % self.virtuosoPort, port=self.virtuosoPort, stateDir=self.virtuosoDataDir, hostname="localhost", odbcPort=self.odbcPort, username="dba", password="dba")
 
     def startVirtuosoServer(self):
-        self._startServer('virtuoso-server', self.binPath('start-virtuoso-server'), 'http://localhost:%s/sparql' % self.httpPort, stateDir=self.virtuosoDataDir, odbcPort=self.odbcPort, httpPort=self.httpPort)
+        self._startServer('virtuoso-server', self.binPath('start-virtuoso-server'), 'http://localhost:%s/sparql' % self.httpPort, stateDir=self.virtuosoDataDir, bulkLoadDir=self.bulkLoadDir, odbcPort=self.odbcPort, httpPort=self.httpPort)
 
     def restartVirtuoso(self):
         self.stopVirtuoso()
@@ -66,5 +67,5 @@ class VirtuosoIntegrationState(IntegrationState):
         self._stopServer('virtuoso')
 
     def runBatchUpload(self, graph):
-        self._runExecutable(self.binPath('virtuoso-batch-upload'), stateDir=self.virtuosoDataDir, odbcPort=self.odbcPort, graph=graph)
+        self._runExecutable(self.binPath('virtuoso-batch-upload'), bulkLoadDir=self.bulkLoadDir, odbcPort=self.odbcPort, graph=graph)
 

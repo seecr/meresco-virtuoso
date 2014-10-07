@@ -27,7 +27,7 @@ ODBC_PORT=1111
 
 TEMP=$(getopt \
     --options "" \
-    --long odbcPort::,stateDir::,graph:: \
+    --long odbcPort::,bulkLoadDir::,graph:: \
     -n "$0" -- "$@")
 
 eval set -- "$TEMP"
@@ -36,8 +36,8 @@ while true ; do
         --odbcPort)
             ODBC_PORT=$2; shift 2
             ;;
-        --stateDir)
-            STATEDIR=$2; shift 2
+        --bulkLoadDir)
+            BULK_LOAD_DIR=$2; shift 2
             ;;
         --graph)
             GRAPH=$2; shift 2
@@ -53,11 +53,10 @@ while true ; do
     esac
 done
 
-if [ -z "$STATEDIR" -o -z "$GRAPH" ]; then
-    echo "Usage: $0 --stateDir=<state directory> --graph=<graph> [ -odbcPort=ODBC_PORT ]"
+if [ -z "${BULK_LOAD_DIR}" -o -z "${GRAPH}" ]; then
+    echo "Usage: $0 --bulkLoadDir=<bulk load directory> --graph=<graph> [ -odbcPort=ODBC_PORT ]"
     exit 1
 fi
 
-BULK_LOAD_DIR="${STATEDIR}/bulk_load"
 isql-v ${ODBC_PORT} exec="ld_dir ('${BULK_LOAD_DIR}', '*', '${GRAPH}');"
 isql-v ${ODBC_PORT} exec="rdf_loader_run();"

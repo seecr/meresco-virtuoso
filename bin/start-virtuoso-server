@@ -30,7 +30,7 @@ HTTP_PORT=8890
 
 TEMP=$(getopt \
     --options "" \
-    --long odbcPort::,stateDir::,httpPort:: \
+    --long odbcPort::,stateDir::,httpPort::,bulkLoadDir:: \
     -n "$0" -- "$@")
 
 eval set -- "$TEMP"
@@ -45,6 +45,9 @@ while true ; do
         --httpPort)
             HTTP_PORT=$2; shift 2
             ;;
+        --bulkLoadDir)
+            BULK_LOAD_DIR=$2; shift 2
+            ;;
         --)
             shift
             break
@@ -57,12 +60,14 @@ while true ; do
 done
 
 if [ -z "$STATEDIR" -o -z "$ODBC_PORT" -o -z "$HTTP_PORT" ]; then
-    echo "Usage: $0 --stateDir=<state directory> [ --odbcPort=ODBC_PORT ] [ --httpPort=HTTP_PORT ]"
+    echo "Usage: $0 --stateDir=<state directory> [ --bulkLoadDir=<bulk_load_dir> --odbcPort=ODBC_PORT ] [ --httpPort=HTTP_PORT ]"
     exit 1
 fi
 mkdir -p $STATEDIR/db
 STATEDIR=$(cd $STATEDIR; pwd)
-BULK_LOAD_DIR="${STATEDIR}/bulk_load"
+if [ -z "${BULK_LOAD_DIR}" ]; then
+    BULK_LOAD_DIR="${STATEDIR}/bulk_load"
+fi
 test -d ${BULK_LOAD_DIR} || mkdir -p ${BULK_LOAD_DIR}
 
 INI_FILE=$STATEDIR/meresco-virtuoso.ini

@@ -214,7 +214,7 @@ class VirtuosoTest(IntegrationTestCase):
 </sparql>""", contents)
 
     def testBatchUpload(self):
-        with open(join(self.virtuosoDataDir, "bulk_load", "test.rdf"), 'w') as f:
+        with open(join(self.bulkLoadDir, "test.rdf"), 'w') as f:
             f.write("""<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <rdf:Description>
         <rdf:type>uri:testBatchUpload</rdf:type>
@@ -224,7 +224,7 @@ class VirtuosoTest(IntegrationTestCase):
         json = self.query('SELECT ?s WHERE { ?s ?p "uri:testBatchUpload" }')
         self.assertEquals(1, len(json['results']['bindings']))
 
-        with open(join(self.virtuosoDataDir, "bulk_load", "test2.rdf"), 'w') as f:
+        with open(join(self.bulkLoadDir, "test2.rdf"), 'w') as f:
             f.write("""<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <rdf:Description>
         <rdf:type>uri:testBatchUpload2</rdf:type>
