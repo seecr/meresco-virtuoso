@@ -79,7 +79,7 @@ sed -i $INI_FILE -re "
         s,/var/lib/virtuoso/db,${STATEDIR}/db,g;
         /\[Parameters\]/,+4 s,^ServerPort.*,ServerPort = ${ODBC_PORT},;
         /\[HTTPServer\]/,+4 s,^ServerPort.*,ServerPort = ${HTTP_PORT},;
-        /\[Parameters\]/,+30 s,^DirsAllowed.*,DirsAllowed = .,/usr/share/virtuoso/vad,${BULK_LOAD_DIR},;
+        /\[Parameters\]/,+30 s,^DirsAllowed.*,DirsAllowed = .\,/usr/share/virtuoso/vad\,${BULK_LOAD_DIR},;
     "
 
 exec virtuoso-t +configfile $INI_FILE +foreground
