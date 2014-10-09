@@ -47,4 +47,4 @@ while true ; do
     esac
 done
 
-isql-v ${ODBC_PORT} exec="log_enable(3, 1); RDF_GLOBAL_RESET ();"
+isql-v ${ODBC_PORT} exec="log_enable(3, 1); RDF_GLOBAL_RESET ();" > /dev/null
