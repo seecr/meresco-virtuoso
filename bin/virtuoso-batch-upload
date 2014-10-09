@@ -58,5 +58,6 @@ if [ -z "${BULK_LOAD_DIR}" -o -z "${GRAPH}" ]; then
     exit 1
 fi
 
-isql-v ${ODBC_PORT} exec="ld_dir ('${BULK_LOAD_DIR}', '*', '${GRAPH}');"
+isql-v ${ODBC_PORT} exec="DELETE FROM DB.DBA.load_list;"
+isql-v ${ODBC_PORT} exec="ld_dir ('${BULK_LOAD_DIR}', '*.gz', '${GRAPH}');"
 isql-v ${ODBC_PORT} exec="rdf_loader_run();"

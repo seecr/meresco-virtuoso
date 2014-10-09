@@ -27,7 +27,7 @@ ODBC_PORT=1111
 
 TEMP=$(getopt \
     --options "" \
-    --long odbcPort::,graph:: \
+    --long odbcPort:: \
     -n "$0" -- "$@")
 
 eval set -- "$TEMP"
@@ -35,9 +35,6 @@ while true ; do
     case "$1" in
         --odbcPort)
             ODBC_PORT=$2; shift 2
-            ;;
-        --graph)
-            GRAPH=$2; shift 2
             ;;
         --)
             shift
@@ -50,9 +47,4 @@ while true ; do
     esac
 done
 
-if [ -z "${GRAPH}" ]; then
-    echo "Usage: $0 --graph=<graph> [ -odbcPort=ODBC_PORT ]"
-    exit 1
-fi
-
-isql-v ${ODBC_PORT} exec="SPARQL CLEAR GRAPH <${GRAPH}>;"
+isql-v ${ODBC_PORT} exec="log_enable(3, 1); RDF_GLOBAL_RESET ();"
