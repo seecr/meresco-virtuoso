@@ -42,6 +42,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.impl.LiteralImpl;
 import org.openrdf.query.resultio.TupleQueryResultFormat;
+import org.openrdf.rio.RDFFormat;
 
 public class VirtuosoTriplestoreTest {
     Triplestore ts;
@@ -80,7 +81,7 @@ public class VirtuosoTriplestoreTest {
     @Test
     public void testAddRdfTwice() throws Exception {
         long startingPoint = ts.size();
-        ts.add("uri:id0", rdf);
+        ts.add("uri:id0", rdf, RDFFormat.RDFXML);
         try {
             assertEquals(startingPoint + 2, ts.size());
         } finally {
@@ -91,7 +92,7 @@ public class VirtuosoTriplestoreTest {
 
     @Test
     public void testDelete() throws Exception {
-        ts.add("uri:id0", rdf);
+        ts.add("uri:id0", rdf, RDFFormat.RDFXML);
         long startingPoint = ts.size();
         ts.delete("uri:id0");
         assertEquals(startingPoint - 2, ts.size());
@@ -101,15 +102,15 @@ public class VirtuosoTriplestoreTest {
     public void testSparqlWithDelete() throws Exception {
         String answer = null;
 
-        ts.add("uri:id0", rdf);
+        ts.add("uri:id0", rdf, RDFFormat.RDFXML);
         try {
-            answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
+            answer = ts.executeTupleQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
             assertTrue(answer.indexOf("\"value\" : \"A.M. Özman Yürekli\"") > -1);
             assertTrue(answer.endsWith("\n}"));
         } finally {
             ts.delete("uri:id0");
         }
-        answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
+        answer = ts.executeTupleQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
         assertFalse(answer.indexOf("\"value\" : \"A.M. Özman Yürekli\"") > -1);
 
     }
@@ -118,9 +119,9 @@ public class VirtuosoTriplestoreTest {
     public void testSparql() throws Exception {
         String answer = null;
 
-        ts.add("uri:id0", rdf);
+        ts.add("uri:id0", rdf, RDFFormat.RDFXML);
         try {
-            answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
+            answer = ts.executeTupleQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.JSON);
             assertTrue(answer.indexOf("\"value\" : \"A.M. Özman Yürekli\"") > -1);
             assertTrue(answer.endsWith("\n}"));
         } finally {
@@ -132,9 +133,9 @@ public class VirtuosoTriplestoreTest {
     public void testSparqlWithNonMatchingOptional() throws Exception {
         String answer = null;
 
-        ts.add("uri:id0", rdf);
+        ts.add("uri:id0", rdf, RDFFormat.RDFXML);
         try {
-            answer = ts.executeQuery("SELECT ?x ?y ?z ?b WHERE {?x ?y ?z . OPTIONAL { ?y ?a ?b }}", TupleQueryResultFormat.JSON);
+            answer = ts.executeTupleQuery("SELECT ?x ?y ?z ?b WHERE {?x ?y ?z . OPTIONAL { ?y ?a ?b }}", TupleQueryResultFormat.JSON);
             assertTrue(answer.indexOf("\"value\" : \"A.M. Özman Yürekli\"") > -1);
             assertTrue(answer.endsWith("\n}"));
         } finally {
@@ -146,9 +147,9 @@ public class VirtuosoTriplestoreTest {
     public void testSparqlResultInXml() throws Exception {
         String answer = null;
 
-        ts.add("uri:id0", rdf);
+        ts.add("uri:id0", rdf, RDFFormat.RDFXML);
         try {
-            answer = ts.executeQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.SPARQL);
+            answer = ts.executeTupleQuery("SELECT ?x ?y ?z WHERE {?x ?y ?z}", TupleQueryResultFormat.SPARQL);
             assertTrue(answer.startsWith("<?xml"));
             assertTrue(answer.indexOf("<literal>A.M. Özman Yürekli</literal>") > -1);
             assertTrue(answer.endsWith("</sparql>\n"));

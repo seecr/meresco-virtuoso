@@ -3,7 +3,7 @@
 #
 # The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
 #
-# Copyright (C) 2014 Seecr (Seek You Too B.V.) http://seecr.nl
+# Copyright (C) 2014-2015 Seecr (Seek You Too B.V.) http://seecr.nl
 #
 # This file is part of "Meresco Virtuoso"
 #
@@ -22,6 +22,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 ## end license ##
+
+source /usr/share/seecr-tools/functions.d/distro
 
 BUILDDIR=../../build/
 test -d ${BUILDDIR} && rm -rf ${BUILDDIR}
@@ -44,15 +46,24 @@ fi                                                                  # DO_NOT_DIS
 JARS=$(find ../../jars -type f -name "*.jar")
 
 CP="$JUNIT:$(echo $JARS | tr ' ' ':'):$(echo $MERESCO_TRIPLESTORE_JARS | tr ' ' ':'):../../build"
+JAVA_VERSION=6
+if distro_is_debian_jessie; then
+    JAVA_VERSION=7
+fi
+javac=/usr/lib/jvm/java-1.${JAVA_VERSION}.0-openjdk.x86_64/bin/javac
+if [ -f /etc/debian_version ]; then
+    javac=/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64/bin/javac
+fi
+
 javaFiles=$(find ../java -name "*.java")
-javac -d ${BUILDDIR} -cp $CP $javaFiles
+${javac} -d ${BUILDDIR} -cp $CP $javaFiles
 if [ "$?" != "0" ]; then
     echo "Build failed"
     exit 1
 fi
 
 javaFiles=$(find . -name "*.java")
-javac -d ${BUILDDIR} -cp $CP $javaFiles
+${javac} -d ${BUILDDIR} -cp $CP $javaFiles
 if [ "$?" != "0" ]; then
     echo "Test Build failed"
     exit 1
