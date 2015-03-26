@@ -3,7 +3,7 @@
 #
 # The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
 #
-# Copyright (C) 2014 Seecr (Seek You Too B.V.) http://seecr.nl
+# Copyright (C) 2014-2015 Seecr (Seek You Too B.V.) http://seecr.nl
 #
 # This file is part of "Meresco Virtuoso"
 #
@@ -71,12 +71,12 @@ fi
 test -d ${BULK_LOAD_DIR} || mkdir -p ${BULK_LOAD_DIR}
 
 INI_FILE=$STATEDIR/meresco-virtuoso.ini
-defaultIniFile=/etc/virtuoso/virtuoso.ini
+defaultIniFile=/etc/virtuoso-opensource-7/virtuoso.ini
 test -f $defaultIniFile || defaultIniFile=/var/lib/virtuoso/db/virtuoso.ini
 cp $defaultIniFile $INI_FILE
 
 sed -i $INI_FILE -re "
-        s,/var/lib/virtuoso/db,${STATEDIR}/db,g;
+        s,/var/lib/virtuoso-opensource-7/db,${STATEDIR}/db,g;
         /\[Parameters\]/,+4 s,^ServerPort.*,ServerPort = ${ODBC_PORT},;
         /\[HTTPServer\]/,+4 s,^ServerPort.*,ServerPort = ${HTTP_PORT},;
         /\[Parameters\]/,+30 s,^DirsAllowed.*,DirsAllowed = .\,/usr/share/virtuoso/vad\,${BULK_LOAD_DIR},;

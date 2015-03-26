@@ -3,7 +3,7 @@
 #
 # The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
 #
-# Copyright (C) 2014 Seecr (Seek You Too B.V.) http://seecr.nl
+# Copyright (C) 2014-2015 Seecr (Seek You Too B.V.) http://seecr.nl
 #
 # This file is part of "Meresco Virtuoso"
 #
@@ -58,6 +58,6 @@ if [ -z "${BULK_LOAD_DIR}" -o -z "${GRAPH}" ]; then
     exit 1
 fi
 
-isql-v ${ODBC_PORT} exec="DELETE FROM DB.DBA.load_list;" > /dev/null
-isql-v ${ODBC_PORT} exec="ld_dir ('${BULK_LOAD_DIR}', '*.gz', '${GRAPH}');" > /dev/null
-isql-v ${ODBC_PORT} exec="rdf_loader_run();" > /dev/null
+isql-vt ${ODBC_PORT} exec="DELETE FROM DB.DBA.load_list;"
+isql-vt ${ODBC_PORT} exec="ld_dir ('${BULK_LOAD_DIR}', '*.gz', '${GRAPH}');"
+isql-vt ${ODBC_PORT} exec="rdf_loader_run();"

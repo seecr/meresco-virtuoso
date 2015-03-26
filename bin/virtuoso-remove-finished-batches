@@ -3,7 +3,7 @@
 #
 # The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
 #
-# Copyright (C) 2014 Seecr (Seek You Too B.V.) http://seecr.nl
+# Copyright (C) 2014-2015 Seecr (Seek You Too B.V.) http://seecr.nl
 #
 # This file is part of "Meresco Virtuoso"
 #
@@ -55,4 +55,4 @@ if [ -z "${BULK_LOAD_DIR}" ]; then
     exit 1
 fi
 
-isql-v ${ODBC_PORT} exec="select ll_file from DB.DBA.load_list WHERE ll_state=2;" | grep "${BULK_LOAD_DIR}" | xargs rm
+isql-vt ${ODBC_PORT} exec="select ll_file from DB.DBA.load_list WHERE ll_state=2;" | grep "${BULK_LOAD_DIR}" | xargs rm
