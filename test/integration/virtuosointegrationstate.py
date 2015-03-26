@@ -2,7 +2,7 @@
 #
 # The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
 #
-# Copyright (C) 2014 Seecr (Seek You Too B.V.) http://seecr.nl
+# Copyright (C) 2014-2015 Seecr (Seek You Too B.V.) http://seecr.nl
 #
 # This file is part of "Meresco Virtuoso"
 #
@@ -69,3 +69,5 @@ class VirtuosoIntegrationState(IntegrationState):
     def runBatchUpload(self, graph):
         self._runExecutable(self.binPath('virtuoso-batch-upload'), bulkLoadDir=self.bulkLoadDir, odbcPort=self.odbcPort, graph=graph)
 
+    def clearBatches(self):
+        self._runExecutable(self.binPath("virtuoso-remove-finished-batches"), bulkLoadDir=self.bulkLoadDir, odbcPort=self.odbcPort)

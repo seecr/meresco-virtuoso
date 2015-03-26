@@ -2,7 +2,7 @@
 #
 # The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
 #
-# Copyright (C) 2014 Seecr (Seek You Too B.V.) http://seecr.nl
+# Copyright (C) 2014-2015 Seecr (Seek You Too B.V.) http://seecr.nl
 #
 # This file is part of "Meresco Virtuoso"
 #
@@ -25,7 +25,7 @@
 from simplejson import loads
 from urllib import urlencode
 from urllib2 import urlopen, Request
-from time import time
+from time import time, sleep
 from threading import Thread
 
 from weightless.core import compose
@@ -35,7 +35,8 @@ from seecr.test.integrationtestcase import IntegrationTestCase
 
 from meresco.triplestore import HttpClient, MalformedQueryException, InvalidRdfXmlException
 from os.path import join
-
+from gzip import open as gzopen
+from os import listdir
 
 class VirtuosoTest(IntegrationTestCase):
     def testOne(self):
@@ -169,27 +170,6 @@ class VirtuosoTest(IntegrationTestCase):
         finally:
             postRequest(self.virtuosoPort, "/delete?identifier=uri:record", "")
 
-    def testAcceptHeaders(self):
-        postRequest(self.virtuosoPort, "/add?identifier=uri:record", """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-        <rdf:Description>
-            <rdf:type>uri:test:acceptHeaders</rdf:type>
-        </rdf:Description>
-    </rdf:RDF>""", parse=False)
-
-        request = Request('http://localhost:%s/query?%s' % (self.virtuosoPort, urlencode({'query': 'SELECT ?x WHERE {?x ?y "uri:test:acceptHeaders"}'})), headers={"Accept" : "application/xml"})
-        contents = urlopen(request).read()
-        self.assertTrue("<binding name='x'>" in contents, contents)
-
-        headers, body = getRequest(self.virtuosoPort, "/query", arguments={'query': 'SELECT ?x WHERE {?x ?y "uri:test:acceptHeaders"}'}, additionalHeaders={"Accept" : "image/jpg"}, parse=False)
-
-        self.assertEquals(["HTTP/1.1 406 Not Acceptable", "Content-type: text/plain"], headers.split('\r\n')[:2])
-        self.assertEqualsWS("""Supported formats:
-- SPARQL/XML (mimeTypes=application/sparql-results+xml, application/xml; ext=srx, xml)
-- BINARY (mimeTypes=application/x-binary-rdf-results-table; ext=brt)
-- SPARQL/JSON (mimeTypes=application/sparql-results+json, application/json; ext=srj, json)
-- SPARQL/CSV (mimeTypes=text/csv; ext=csv)
-- SPARQL/TSV (mimeTypes=text/tab-separated-values; ext=tsv)""", body)
-
     def testMimeTypeArgument(self):
         postRequest(self.virtuosoPort, "/add?identifier=uri:record", """<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
         <rdf:Description rdf:about="uri:test:mimeType">
@@ -214,7 +194,7 @@ class VirtuosoTest(IntegrationTestCase):
 </sparql>""", contents)
 
     def testBatchUpload(self):
-        with open(join(self.bulkLoadDir, "test.rdf"), 'w') as f:
+        with gzopen(join(self.bulkLoadDir, "test.rdf.gz"), 'w') as f:
             f.write("""<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <rdf:Description>
         <rdf:type>uri:testBatchUpload</rdf:type>
@@ -223,8 +203,8 @@ class VirtuosoTest(IntegrationTestCase):
         self.runBatchUpload(graph="uri:example.org")
         json = self.query('SELECT ?s WHERE { ?s ?p "uri:testBatchUpload" }')
         self.assertEquals(1, len(json['results']['bindings']))
-
-        with open(join(self.bulkLoadDir, "test2.rdf"), 'w') as f:
+        self.clearBatches()
+        with gzopen(join(self.bulkLoadDir, "test2.rdf.gz"), 'w') as f:
             f.write("""<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <rdf:Description>
         <rdf:type>uri:testBatchUpload2</rdf:type>
