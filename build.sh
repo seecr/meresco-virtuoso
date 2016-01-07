@@ -3,7 +3,7 @@
 #
 # The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
 #
-# Copyright (C) 2014-2015 Seecr (Seek You Too B.V.) http://seecr.nl
+# Copyright (C) 2014-2016 Seecr (Seek You Too B.V.) http://seecr.nl
 #
 # This file is part of "Meresco Virtuoso"
 #
@@ -48,10 +48,7 @@ mkdir $BUILDDIR
 
 CP="$(echo $JARS | tr ' ' ':'):$(echo $MERESCO_TRIPLESTORE_JARS | tr ' ' ':')"
 
-JAVA_VERSION=6
-if distro_is_debian_jessie; then
-    JAVA_VERSION=7
-fi
+JAVA_VERSION=7
 javac=/usr/lib/jvm/java-1.${JAVA_VERSION}.0-openjdk.x86_64/bin/javac
 if [ -f /etc/debian_version ]; then
     javac=/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64/bin/javac

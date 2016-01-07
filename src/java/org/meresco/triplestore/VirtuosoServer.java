@@ -2,7 +2,7 @@
  *
  * The Meresco Virtuoso package is an Virtuoso Triplestore based on meresco-triplestore
  *
- * Copyright (C) 2014 Seecr (Seek You Too B.V.) http://seecr.nl
+ * Copyright (C) 2014, 2016 Seecr (Seek You Too B.V.) http://seecr.nl
  *
  * This file is part of "Meresco Virtuoso"
  *
@@ -26,6 +26,8 @@ package org.meresco.triplestore;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -33,6 +35,11 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 
 import org.openrdf.rio.RDFParseException;
 
@@ -96,13 +103,22 @@ public class VirtuosoServer {
         }
 
         Triplestore tripleStore = new VirtuosoTriplestore(new File(stateDir), hostname, odbcPort, username, password);
-        HttpHandler handler = new HttpHandler(tripleStore);
-        HttpServer httpServer = new HttpServer(port, 15);
+
+        ExecutorThreadPool pool = new ExecutorThreadPool(50, 200, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
+        Server server = new Server(pool);
+
+        ContextHandler context = new ContextHandler("/");
+        context.setHandler(new HttpHandler(tripleStore));
+
+        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory());
+        http.setPort(port);
+        server.addConnector(http);
 
         System.out.println("Triplestore started with " + String.valueOf(tripleStore.size()) + " statements");
         System.out.flush();
 
-        httpServer.setHandler(handler);
-        httpServer.start();
+        server.setHandler(context);
+        server.start();
+        server.join();
     }
 }
